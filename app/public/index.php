@@ -12,6 +12,7 @@ use App\Services\EnvService;
 use App\Services\ErrorReportingService;
 use App\Services\ResponseService;
 use App\Controllers\ArticleController;
+use App\Controllers\AuthController;
 
 // require vendor libraries
 use Steampixel\Route;
@@ -30,6 +31,30 @@ ResponseService::SetCorsHeaders();
  */
 // top level fail-safe try/catch
 try {
+    /**
+     * Auth routes
+     */
+    Route::add('/auth/register', function () {
+        $authController = new AuthController();
+        $authController->register();
+    }, ["post"]);
+
+    Route::add('/auth/login', function () {
+        $authController = new AuthController();
+        $authController->login();
+    }, ["post"]);
+
+    Route::add('/auth/me', function () {
+        $authController = new AuthController();
+        $authController->me();
+    }, ["get"]);
+
+    // update article by id
+    Route::add('/auth/is-me/([0-9]*)', function ($id) {
+        $authController = new AuthController();
+        $authController->isMe($id);
+    }, 'get');
+
     /**
      * Article routes
      */
