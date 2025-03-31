@@ -1,0 +1,8 @@
+
+dphp:S100"KRename function "Send" to match the regular expression ^[a-z][a-zA-Z0-9]*$.(«Ñâ¯ûÿÿÿÿ
+ephp:S100"LRename function "Error" to match the regular expression ^[a-z][a-zA-Z0-9]*$.(±áåÊúÿÿÿÿ
+iphp:S100"URename function "SetCorsHeaders" to match the regular expression ^[a-z][a-zA-Z0-9]*$.(þ–™µ
+R	php:S1784"8Explicitly mention the visibility of this method "Send".(«Ñâ¯ûÿÿÿÿ
+S	php:S1784"9Explicitly mention the visibility of this method "Error".(±áåÊúÿÿÿÿ
+W	php:S1784"BExplicitly mention the visibility of this method "SetCorsHeaders".(þ–™µ
+M	php:S1757"3Change this opening tag to either "<?php" or "<?=".(ïËëºøÿÿÿÿ

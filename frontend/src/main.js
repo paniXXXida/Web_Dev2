@@ -1,22 +1,20 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "./components/Home.vue";
-import About from "./components/About.vue";
-import ArticleUpdate from "./components/ArticleUpdate.vue";
-import ArticleUpdateImproved from "./components/ArticleUpdateImproved.vue";
-import ArticleCreate from "./components/ArticleCreate.vue";
+import { createApp } from "vue";
+import { createPinia } from "pinia";
+
+import App from "./App.vue";
+import HomePage from "./components/HomePage.vue";
+import BookList from "./components/BookList.vue";
+import BookRequests from "./components/BookRequest.vue";
+import BookPage from "./components/BookPage.vue";
 import Auth from "./components/Auth.vue";
 import Profile from "./components/Profile.vue";
-import ArticlePage from "./components/ArticlePage.vue";
-import ReadLaterTable from "./components/ReadLaterTable.vue";
+
 import { getAuthToken, setAuthToken } from "@/utils/auth";
-import { createPinia } from "pinia";
 
 import "./assets/main.css";
 
-import { createApp } from "vue";
-import App from "./App.vue";
-
-// Initialize auth token if it exists
+// Set token if it exists
 const token = getAuthToken();
 if (token) {
   setAuthToken(token);
@@ -25,27 +23,19 @@ if (token) {
 const routes = [
   {
     path: "/",
-    component: Home,
+    component: HomePage,
   },
   {
-    path: "/about",
-    component: About,
+    path: "/books",
+    component: BookList,
   },
   {
-    path: "/article",
-    component: ArticleCreate,
+    path: "/books/:id",
+    component: BookPage,
   },
   {
-    path: "/article/:id",
-    component: ArticlePage,
-  },
-  {
-    path: "/articles-edit/:id",
-    component: ArticleUpdate,
-  },
-  {
-    path: "/articles-improved/:id",
-    component: ArticleUpdateImproved,
+    path: "/bookrequest",
+    component: BookRequests,
   },
   {
     path: "/auth",
@@ -55,10 +45,6 @@ const routes = [
     path: "/profile",
     component: Profile,
   },
-  {
-    path: "/read-later",
-    component: ReadLaterTable,
-  },
 ];
 
 const router = createRouter({
@@ -67,8 +53,6 @@ const router = createRouter({
 });
 
 const app = createApp(App);
-
 app.use(router);
 app.use(createPinia());
-
 app.mount("#app");

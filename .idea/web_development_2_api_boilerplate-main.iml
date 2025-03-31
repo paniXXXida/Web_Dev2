@@ -7,6 +7,10 @@
       <sourceFolder url="file://$MODULE_DIR$/app/./controllers" isTestSource="false" packagePrefix="App\Controllers\" />
       <sourceFolder url="file://$MODULE_DIR$/app/./models" isTestSource="false" packagePrefix="App\Models\" />
       <sourceFolder url="file://$MODULE_DIR$/app/./services" isTestSource="false" packagePrefix="App\Services\" />
+      <sourceFolder url="file://$MODULE_DIR$/backend/." isTestSource="false" packagePrefix="App\" />
+      <sourceFolder url="file://$MODULE_DIR$/backend/./controllers" isTestSource="false" packagePrefix="App\Controllers\" />
+      <sourceFolder url="file://$MODULE_DIR$/backend/./models" isTestSource="false" packagePrefix="App\Models\" />
+      <sourceFolder url="file://$MODULE_DIR$/backend/./services" isTestSource="false" packagePrefix="App\Services\" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/chillerlan/php-qrcode" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/chillerlan/php-settings-container" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/composer" />

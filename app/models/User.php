@@ -2,44 +2,38 @@
 
 namespace App\Models;
 
+require_once 'Model.php';
+
 class User extends Model
 {
-    public function create($email, $password)
+    protected string $table = "users";
+
+    public function findByEmail(string $email): ?array
     {
-        // Validate email format
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new \InvalidArgumentException('Invalid email format');
-        }
+        $sql = "SELECT * FROM {$this->table} WHERE email = :email";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
 
-        // Additional validation for email length and domain
-        if (strlen($email) > 254) {
-            throw new \InvalidArgumentException('Email is too long');
-        }
-
-        // Extract domain and validate
-        $domain = substr(strrchr($email, "@"), 1);
-        if (!checkdnsrr($domain, 'MX')) {
-            throw new \InvalidArgumentException('Invalid email domain');
-        }
-
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = self::$pdo->prepare("INSERT INTO users (email, password) VALUES (?, ?)");
-        $stmt->execute([$email, $hashedPassword]);
-
-        $userId = self::$pdo->lastInsertId();
-        return $this->findById($userId);
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $user ?: null;
     }
 
-    public function findByEmail($email)
+    public function create(array $data): bool
     {
-        $stmt = self::$pdo->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        $sql = "INSERT INTO {$this->table} (name, email, password, role) VALUES (:name, :email, :password, :role)";
+        $stmt = self::$pdo->prepare($sql);
+        return $stmt->execute([
+            ':name'     => $data['name'],
+            ':email'    => $data['email'],
+            ':password' => $data['password'],
+            ':role'     => $data['role'] ?? 'customer',
+        ]);
     }
 
     public function findById($id)
     {
-        $stmt = self::$pdo->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt = self::$pdo->prepare("SELECT * FROM {$this->table} WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }

@@ -1,67 +1,19 @@
-<script>
-import { API_ENDPOINTS } from "@/config";
-import axios from "axios";
+<script setup>
+import { useRouter } from "vue-router";
+import { useAuth } from "@/utils/useAuth";
 import Notification from "./Notification.vue";
 import Loading from "./Loading.vue";
-import { setAuthToken } from "@/utils/auth";
 
-export default {
-  name: "Auth",
-  data() {
-    return {
-      isLogin: true,
-      formData: {
-        email: "",
-        password: "",
-      },
-      error: null,
-      isLoading: false,
-      success: null,
-    };
-  },
-  components: {
-    Notification,
-    Loading,
-  },
-  methods: {
-    toggleAuthMode() {
-      this.isLogin = !this.isLogin;
-      this.error = null;
-      this.isLoading = false;
-      this.formData.email = "";
-      this.formData.password = "";
-    },
-    async handleSubmit() {
-      // console.log("handleSubmit");
-      try {
-        this.error = null;
-        this.isLoading = true;
-        const endpoint = this.isLogin
-          ? API_ENDPOINTS.auth + "/login"
-          : API_ENDPOINTS.auth + "/register";
-
-        const response = await axios.post(endpoint, this.formData);
-
-        if (this.isLogin) {
-          this.success = "Login successful";
-          localStorage.setItem("token", response.data.token);
-          setAuthToken(response.data.token);
-          this.$router.push("/profile");
-        } else {
-          this.success = "Register successful";
-          this.isLogin = true;
-        }
-      } catch (error) {
-        console.error(error);
-        this.error =
-          error?.response?.data?.error ||
-          "An error occurred during authentication";
-      } finally {
-        this.isLoading = false;
-      }
-    },
-  },
-};
+const router = useRouter();
+const {
+  isLogin,
+  formData,
+  isLoading,
+  error,
+  success,
+  toggleAuthMode,
+  handleSubmit,
+} = useAuth(router);
 </script>
 
 <template>
@@ -83,38 +35,51 @@ export default {
           </div>
 
           <form @submit.prevent="handleSubmit">
+            <div class="mb-3" v-if="!isLogin">
+              <label for="name" class="form-label">Name</label>
+              <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  v-model="formData.name"
+                  required
+                  placeholder="Enter your name"
+              />
+            </div>
+
             <div class="mb-3">
               <label for="email" class="form-label">Email</label>
               <input
-                type="email"
-                class="form-control"
-                id="email"
-                v-model="formData.email"
-                required
-                placeholder="Enter your email"
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  v-model="formData.email"
+                  required
+                  placeholder="Enter your email"
               />
             </div>
 
             <div class="mb-3">
               <label for="password" class="form-label">Password</label>
               <input
-                type="password"
-                class="form-control"
-                id="password"
-                v-model="formData.password"
-                required
-                placeholder="Enter your password"
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  v-model="formData.password"
+                  required
+                  placeholder="Enter your password"
               />
             </div>
             <button type="submit" class="btn btn-primary w-100">
               {{ isLogin ? "Login" : "Register" }}
             </button>
           </form>
+
           <Notification
-            v-if="error"
-            :isError="true"
-            @close="error = null"
-            class="mt-3"
+              v-if="error"
+              :isError="true"
+              @close="error = null"
+              class="mt-3"
           >
             {{ error }}
           </Notification>
