@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-require_once 'Model.php';
-
 class User extends Model
 {
     protected string $table = "users";
@@ -33,8 +31,14 @@ class User extends Model
 
     public function findById($id)
     {
-        $stmt = self::$pdo->prepare("SELECT * FROM {$this->table} WHERE id = ?");
+        $stmt = self::$pdo->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    public function getAll()
+    {
+        $stmt = self::$pdo->query("SELECT * FROM users ORDER BY id DESC");
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 }

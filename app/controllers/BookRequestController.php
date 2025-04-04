@@ -26,7 +26,7 @@ class BookRequestController
         }
 
         $userId = $payload['id'];
-        $requests = $this->requestModel->findByUserId($userId);
+        $requests = $this->requestModel->findByUserIdWithBookTitles($userId);
 
         return ResponseService::Send($requests);
     }
@@ -57,6 +57,26 @@ class BookRequestController
             return ResponseService::Send(["message" => "Request submitted"]);
         } else {
             return ResponseService::Error("Failed to submit request", 500);
+        }
+    }
+
+    public function cancelRequest($id)
+    {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        $token = str_replace('Bearer ', '', $authHeader);
+        $payload = JWTHelper::verifyToken($token);
+
+        if (!$payload || !isset($payload['id'])) {
+            return ResponseService::Error("Unauthorized", 401);
+        }
+
+        $userId = $payload['id'];
+        $success = $this->requestModel->cancelRequest($id, $userId);
+
+        if ($success) {
+            return ResponseService::Send(["message" => "Request cancelled"]);
+        } else {
+            return ResponseService::Error("Failed to cancel request", 500);
         }
     }
 }

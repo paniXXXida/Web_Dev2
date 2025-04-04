@@ -25,14 +25,29 @@ class BookController extends Controller
         ResponseService::Send($this->bookModel->get($id));
     }
 
-    function create()
+    public function create()
     {
-        $data = $this->decodePostData();
-        $this->validateInput(["title", "author"], $data);
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        $token = str_replace('Bearer ', '', $authHeader);
+        $payload = JWTHelper::verifyToken($token);
 
-        $newBook = $this->bookModel->create($data);
-        ResponseService::Send($newBook);
+        if (!$payload || ($payload['role'] ?? null) !== 'admin') {
+            return ResponseService::Error("Unauthorized", 401);
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        if (!isset($data['title'], $data['author'])) {
+            return ResponseService::Error("Missing required fields", 400);
+        }
+
+        $success = $this->bookModel->create($data);
+
+        return $success
+            ? ResponseService::Send(["message" => "Book added"])
+            : ResponseService::Error("Failed to add book", 500);
     }
+
 
     function update($id)
     {

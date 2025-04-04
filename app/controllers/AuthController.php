@@ -56,4 +56,26 @@ class AuthController extends Controller
 
         return ResponseService::Send(["token" => $token]);
     }
+
+    public function me()
+    {
+        $headers = getallheaders();
+        if (!isset($headers['Authorization'])) {
+            return ResponseService::Error("Unauthorized", 401);
+        }
+
+        $token = str_replace("Bearer ", "", $headers['Authorization']);
+        $payload = \App\Services\JWTHelper::verifyToken($token);
+
+        if (!$payload || !isset($payload['id'])) {
+            return ResponseService::Error("Invalid token", 401);
+        }
+
+        $user = $this->userModel->findById($payload['id']);
+        if (!$user) {
+            return ResponseService::Error("User not found", 404);
+        }
+
+        return ResponseService::Send($user);
+    }
 }

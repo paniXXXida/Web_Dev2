@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from "vue-router";
-import { useAuth } from "@/utils/useAuth";
+import { useAuth } from "@/utils/auth.js";
 import Notification from "./Notification.vue";
 import Loading from "./Loading.vue";
 

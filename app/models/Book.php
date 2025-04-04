@@ -4,20 +4,15 @@ namespace App\Models;
 
 class Book extends Model
 {
-    static $resultLimit = 10;
 
     public function __construct()
     {
         parent::__construct();
     }
 
-    public function getAll($page = 1)
+    public function getAll()
     {
-        $offset = ($page - 1) * self::$resultLimit;
-
-        $query = self::$pdo->prepare('SELECT * FROM books ORDER BY id DESC LIMIT :limit OFFSET :offset');
-        $query->bindParam(':limit', self::$resultLimit, \PDO::PARAM_INT);
-        $query->bindParam(':offset', $offset, \PDO::PARAM_INT);
+        $query = self::$pdo->prepare('SELECT * FROM books ORDER BY id DESC');
         $query->execute();
 
         return $query->fetchAll(\PDO::FETCH_ASSOC);
@@ -30,17 +25,17 @@ class Book extends Model
         return $statement->fetch(\PDO::FETCH_ASSOC);
     }
 
-    public function create($book)
+    public function create($data)
     {
-        $query = "INSERT INTO books (title, author) VALUES (:title, :author)";
-        $statement = self::$pdo->prepare($query);
-        $statement->execute([
-            "title" => $book["title"],
-            "author" => $book["author"]
+        $stmt = self::$pdo->prepare("
+            INSERT INTO books (title, author, description)
+            VALUES (:title, :author, :description)
+        ");
+        return $stmt->execute([
+            'title' => $data['title'],
+            'author' => $data['author'],
+            'description' => $data['description'] ?? ''
         ]);
-
-        $newBookId = self::$pdo->lastInsertId();
-        return $this->get($newBookId);
     }
 
     public function update($id, $book)
