@@ -2,34 +2,54 @@
 
 namespace App\Models;
 
-require_once 'Model.php';
-
 class BookRequest extends Model
 {
-    protected string $table = "book_requests";
-
-    public function findByUserId(int $userId): array
+    public function create($data)
     {
-        $sql = "SELECT br.*, b.title AS book FROM {$this->table} br
-                JOIN books b ON br.book_id = b.id
-                WHERE br.user_id = :user_id
-                ORDER BY br.requested_at DESC";
+        $stmt = self::$pdo->prepare("INSERT INTO book_requests (user_id, book_id, status) VALUES (:user_id, :book_id, :status)");
+        return $stmt->execute([
+            'user_id' => $data['user_id'],
+            'book_id' => $data['book_id'],
+            'status'  => $data['status'] ?? 'pending'
+        ]);
+    }
 
-        $stmt = self::$pdo->prepare($sql);
-        $stmt->bindParam(':user_id', $userId);
-        $stmt->execute();
+    public function updateStatus($id, $status)
+    {
+        $stmt = self::$pdo->prepare("UPDATE book_requests SET status = :status WHERE id = :id");
+        return $stmt->execute([
+            'id' => $id,
+            'status' => $status,
+        ]);
+    }
 
+
+    public function findByUserIdWithBookTitles($userId)
+    {
+        $stmt = self::$pdo->prepare("SELECT br.*, b.title AS book_title FROM book_requests br JOIN books b ON br.book_id = b.id WHERE br.user_id = :user_id ORDER BY br.id DESC");
+        $stmt->execute(['user_id' => $userId]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function create(array $data): bool
+    public function cancelRequest($id, $userId)
     {
-        $sql = "INSERT INTO {$this->table} (user_id, book_id, status) VALUES (:user_id, :book_id, :status)";
-        $stmt = self::$pdo->prepare($sql);
+        $stmt = self::$pdo->prepare("UPDATE book_requests SET status = 'cancelled' WHERE id = :id AND user_id = :user_id AND status = 'pending'");
         return $stmt->execute([
-            ':user_id' => $data['user_id'],
-            ':book_id' => $data['book_id'],
-            ':status'  => $data['status'] ?? 'pending'
+            'id' => $id,
+            'user_id' => $userId
         ]);
     }
+
+    public function getAll()
+    {
+        $stmt = self::$pdo->query("
+        SELECT br.*, u.name AS user_name, b.title AS book_title 
+        FROM book_requests br 
+        JOIN users u ON br.user_id = u.id 
+        JOIN books b ON br.book_id = b.id 
+        ORDER BY br.id DESC
+    ");
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
 }

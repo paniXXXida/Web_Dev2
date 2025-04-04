@@ -11,7 +11,7 @@ namespace App\Models;
 class Model
 {
 
-    protected static $pdo;
+    public static $pdo;
 
     function __construct()
     {

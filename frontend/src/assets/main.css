@@ -41,3 +41,6 @@
 .text-danger {
     font-weight: bold;
 }
+.list-group-item {
+    margin-bottom: 0.5rem;
+}

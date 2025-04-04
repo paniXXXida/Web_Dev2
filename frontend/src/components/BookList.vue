@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import axios from "axios";
 import { getAuthToken } from "@/utils/auth";
 
@@ -7,6 +8,7 @@ const books = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const requestSuccess = ref(null);
+const router = useRouter();
 
 onMounted(async () => {
   try {
@@ -33,6 +35,10 @@ const requestBook = async (bookId) => {
     error.value = "Failed to request book";
   }
 };
+
+const goToBookPage = (bookId) => {
+  router.push(`/books/${bookId}`);
+};
 </script>
 
 <template>
@@ -41,7 +47,12 @@ const requestBook = async (bookId) => {
     <div v-if="loading">Loading books...</div>
     <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
     <div v-else>
-      <div v-for="book in books" :key="book.id" class="card mb-3">
+      <div
+          v-for="book in books"
+          :key="book.id"
+          class="card mb-3 cursor-pointer"
+          @click="goToBookPage(book.id)"
+      >
         <div class="card-body d-flex justify-content-between align-items-center">
           <div>
             <h5 class="card-title mb-1">{{ book.title }}</h5>
@@ -49,7 +60,7 @@ const requestBook = async (bookId) => {
           </div>
           <button
               class="btn btn-outline-primary"
-              @click="requestBook(book.id)"
+              @click.stop="requestBook(book.id)"
               :disabled="requestSuccess === book.id"
           >
             {{ requestSuccess === book.id ? "Requested" : "Request" }}
@@ -60,4 +71,8 @@ const requestBook = async (bookId) => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.cursor-pointer {
+  cursor: pointer;
+}
+</style>
